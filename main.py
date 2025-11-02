@@ -14,7 +14,7 @@ is_farsi = st.session_state.language == "فا"
 # Centered language toggle button
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
-    toggle_label = "🇮🇷 تغییر به انگلیسی" if is_farsi else "🇬🇧 Switch to Persian"
+    toggle_label = "🇮🇷 -> 🇬🇧 Switch to English" if is_farsi else "🇬🇧 -> 🇮🇷 تغییر به فارسی"
     if st.button(toggle_label):
         st.session_state.language = "EN" if is_farsi else "فا"
         st.rerun()
