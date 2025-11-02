@@ -3,6 +3,12 @@ import random
 from core.affix_manager import load_affixes, save_affixes, merge_affixes
 from core.ui_components import affix_select_ui, update_word, display_word
 from utils.loader import save_affixes_json
+import re
+
+def is_farsi_text(text):
+    """Check if the input contains at least one Persian character."""
+    return bool(re.search(r'[\u0600-\u06FF]', text))
+
 
 def run_app(is_farsi: bool):
     DATA_PATH = "data/affixes.json"
@@ -22,6 +28,8 @@ def run_app(is_farsi: bool):
             border-radius: 12px;
             font-family: "Vazir", "Comic Sans MS", cursive;
             animation: pop 0.6s ease-out;
+            margin-bottom: 32px;
+
         }
 
         @keyframes pop {
@@ -80,21 +88,36 @@ def run_app(is_farsi: bool):
             submitted = st.form_submit_button("افزودن" if is_farsi else "Add")
 
             if submitted:
-                added = False
-                if new_prefix and new_prefix not in affixes["prefixes"]:
-                    affixes["prefixes"].append(new_prefix)
-                    added = True
-                if new_root and new_root not in affixes["roots"]:
-                    affixes["roots"].append(new_root)
-                    added = True
-                if new_suffix and new_suffix not in affixes["suffixes"]:
-                    affixes["suffixes"].append(new_suffix)
-                    added = True
+                errors = []
 
-                if added:
-                    save_affixes_json(DATA_PATH, affixes)
-                    st.success("وندها با موفقیت اضافه شدند." if is_farsi else "Affixes added successfully.")
+                # بررسی فارسی بودن
+                if new_prefix and not is_farsi_text(new_prefix):
+                    errors.append("پیشوند باید فارسی باشد.")
+                if new_root and not is_farsi_text(new_root):
+                    errors.append("ریشه باید فارسی باشد.")
+                if new_suffix and not is_farsi_text(new_suffix):
+                    errors.append("پسوند باید فارسی باشد.")
+
+                if errors:
+                    for err in errors:
+                        st.error(err)
                 else:
-                    st.warning("هیچ وند جدیدی اضافه نشد." if is_farsi else "No new affix was added.")
+                    added = False
+                    if new_prefix and new_prefix not in affixes["prefixes"]:
+                        affixes["prefixes"].append(new_prefix)
+                        added = True
+                    if new_root and new_root not in affixes["roots"]:
+                        affixes["roots"].append(new_root)
+                        added = True
+                    if new_suffix and new_suffix not in affixes["suffixes"]:
+                        affixes["suffixes"].append(new_suffix)
+                        added = True
 
-                st.session_state.show_add_form = False
+                    if added:
+                        save_affixes_json(DATA_PATH, affixes)
+                        st.success("وندها با موفقیت اضافه شدند.")
+                    else:
+                        st.warning("هیچ وند جدیدی اضافه نشد.")
+
+                    st.session_state.show_add_form = False
+
