@@ -63,30 +63,41 @@ def run_app(is_farsi: bool):
 
     def spin_random(affixes):
         # Always include root
-        root = random.choice(affixes["roots"]) if affixes["roots"] else ""
+        if st.session_state.get("lock_root"):
+            root = st.session_state.selected_root
+        else:
+            root = random.choice(affixes["roots"]) if affixes["roots"] else ""
 
-        # Randomly decide whether to include prefix and suffix
+        # Randomly include prefix/suffix unless locked
         include_prefix = random.choice([True, False])
         include_suffix = random.choice([True, False])
 
-        # ✅ Ensure at least one of prefix or suffix is included
+        # Ensure at least one of prefix/suffix is included
         if not include_prefix and not include_suffix:
-            # Randomly force one of them to be True
             if random.choice(["prefix", "suffix"]) == "prefix":
                 include_prefix = True
             else:
                 include_suffix = True
 
-        # Assign values
-        st.session_state.selected_prefix = (
-            random.choice(affixes["prefixes"]) if include_prefix and affixes["prefixes"] else ""
-        )
+        # Handle prefix
+        if st.session_state.get("lock_prefix"):
+            prefix = st.session_state.selected_prefix
+        else:
+            prefix = random.choice(affixes["prefixes"]) if include_prefix and affixes["prefixes"] else ""
+
+        # Handle suffix
+        if st.session_state.get("lock_suffix"):
+            suffix = st.session_state.selected_suffix
+        else:
+            suffix = random.choice(affixes["suffixes"]) if include_suffix and affixes["suffixes"] else ""
+
+        # Update session state
+        st.session_state.selected_prefix = prefix
         st.session_state.selected_root = root
-        st.session_state.selected_suffix = (
-            random.choice(affixes["suffixes"]) if include_suffix and affixes["suffixes"] else ""
-        )
+        st.session_state.selected_suffix = suffix
 
         update_word()
+
 
     # Affix selection UI
     affix_select_ui(affixes, lang="fa" if is_farsi else "en")
