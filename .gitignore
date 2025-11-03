@@ -1,0 +1,54 @@
+# .gitignore for Streamlit project
+# Virtual environments
+env/
+.venv/
+venv/
+
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Conda and site-packages
+miniconda3/
+*/site-packages/
+
+# Streamlit config and secrets
+.streamlit/config.toml
+.streamlit/secrets.toml
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Data and model files (optional)
+*.csv
+*.tsv
+*.xlsx
+*.h5
+*.pkl
+*.joblib
+*.db
+*.sqlite
+
+# Output files
+*.html
+*.svg
+*.pdf
+*.png
+*.jpg
+*.jpeg
+
+# IDE settings
+.vscode/
+.idea/
+*.code-workspace
