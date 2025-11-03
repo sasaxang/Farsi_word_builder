@@ -42,7 +42,7 @@ def run_app(is_farsi: bool):
 
     # Display responsive app title with reduced top margin and single-line behavior on mobile
     st.markdown(f"""
-    <div style="margin-top:-1rem; font-size:clamp(1.2rem, 4vw, 2rem); text-align:center; white-space:nowrap;">
+    <div style="margin-top:-1rem; font-size:clamp(2.2rem, 10vw, 4rem); text-align:center; white-space:nowrap;">
         {'گردونه واژه‌ساز فارسی' if is_farsi else 'Persian Word Spinner'}
     </div>
     """, unsafe_allow_html=True)
