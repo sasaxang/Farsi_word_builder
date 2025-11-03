@@ -30,6 +30,7 @@ def affix_select_ui(affixes, lang="fa"):
     structure = st.selectbox(
         labels[lang]["structure"],
         structure_options[lang],
+        index=2,
         key="word_structure"
     )
 
