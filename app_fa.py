@@ -90,11 +90,11 @@ def run_app(is_farsi: bool):
     # Affix selection UI
     affix_select_ui(affixes, lang="fa" if is_farsi else "en")
 
-    # Random word generation button
-    st.button("تصادفی بساز!" if is_farsi else "Spin Random!", on_click=lambda: spin_random(affixes))
-
     # Display the generated word
     display_word()
+
+    # Random word generation button
+    st.button("تصادفی بساز!" if is_farsi else "Spin Random!", on_click=lambda: spin_random(affixes))
 
     # Toggle to show the add affix form
     if st.button("➕ افزودن وند" if is_farsi else "➕ Add Affix"):
