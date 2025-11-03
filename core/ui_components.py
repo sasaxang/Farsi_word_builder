@@ -8,14 +8,14 @@ def affix_select_ui(affixes, lang="fa"):
             "prefix": "پیشوند",
             "root": "ریشه",
             "suffix": "پسوند",
-            "lock": "🔒 ثابت نگه‌دار",
+            "lock": "ثابت نگه‌دار",
             "structure": "ساختار واژه"
         },
         "en": {
             "prefix": "Prefix",
             "root": "Root",
             "suffix": "Suffix",
-            "lock": "🔒 Lock",
+            "lock": "Lock",
             "structure": "Word Structure"
         }
     }
