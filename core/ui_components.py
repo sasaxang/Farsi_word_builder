@@ -4,9 +4,20 @@ from core.word_builder import combine_affixes
 def affix_select_ui(affixes, lang="fa"):
     # Define labels for multilingual support
     labels = {
-        "fa": {"prefix": "پیشوند", "root": "ریشه", "suffix": "پسوند", "lock": "🔒 ثابت نگه دار"},
-        "en": {"prefix": "Prefix", "root": "Root", "suffix": "Suffix", "lock": "🔒 Lock"}
+        "fa": {"prefix": "پیشوند", "root": "ریشه", "suffix": "پسوند", "lock": "🔒 ثابت نگه‌دار", "structure": "ساختار واژه"},
+        "en": {"prefix": "Prefix", "root": "Root", "suffix": "Suffix", "lock": "🔒 Lock", "structure": "Word Structure"}
     }
+
+    # Display word structure selector above affix selectors
+    structure = st.selectbox(
+        labels[lang]["structure"],
+        ["پیشوند + ریشه", "ریشه + پسوند", "پیشوند + ریشه + پسوند"],
+        key="word_structure"
+    )
+
+    # Determine which components should be disabled
+    disable_prefix = structure == "ریشه + پسوند"
+    disable_suffix = structure == "پیشوند + ریشه"
 
     # Display affix selectors with lock checkboxes in three columns
     col1, col2, col3 = st.columns(3)
@@ -16,9 +27,10 @@ def affix_select_ui(affixes, lang="fa"):
             labels[lang]["prefix"],
             [""] + affixes["prefixes"],
             key="selected_prefix",
-            on_change=update_word
+            on_change=update_word,
+            disabled=disable_prefix
         )
-        st.checkbox(labels[lang]["lock"], key="lock_prefix")
+        st.checkbox(labels[lang]["lock"], key="lock_prefix", disabled=disable_prefix)
 
     with col2:
         st.selectbox(
@@ -34,9 +46,10 @@ def affix_select_ui(affixes, lang="fa"):
             labels[lang]["suffix"],
             [""] + affixes["suffixes"],
             key="selected_suffix",
-            on_change=update_word
+            on_change=update_word,
+            disabled=disable_suffix
         )
-        st.checkbox(labels[lang]["lock"], key="lock_suffix")
+        st.checkbox(labels[lang]["lock"], key="lock_suffix", disabled=disable_suffix)
 
 def update_word():
     # Combine selected affixes into a single word and store in session state
