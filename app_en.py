@@ -40,17 +40,6 @@ def run_app(is_farsi: bool):
         </style>
     """, unsafe_allow_html=True)
 
-    # Display responsive app title with reduced top margin and single-line behavior on mobile
-    st.markdown(f"""
-    <div style="margin-top:-1rem; font-size:clamp(2.2rem, 10vw, 4rem); text-align:center; white-space:nowrap;">
-        {'گردونه واژه‌ساز فارسی' if is_farsi else 'Persian Word Spinner'}
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Display caption below the title
-    st.caption("ساخت واژه‌های تصادفی با ترکیب پیشوند، ریشه و پسوند" if is_farsi else "Generate random Persian words by combining prefix, root, and suffix")
-
-
     affixes = load_affixes(DATA_PATH)
 
     # Initialize selections
@@ -62,12 +51,12 @@ def run_app(is_farsi: bool):
         update_word()
 
     def spin_random(affixes):
-        # Retrieve selected word structure from session state
+    # Retrieve selected word structure from session state
         structure = st.session_state.get("word_structure", "پیشوند + ریشه + پسوند")
 
         # Determine which components to include based on selected structure
-        include_prefix = structure in ["پیشوند + ریشه", "پیشوند + ریشه + پسوند"]
-        include_suffix = structure in ["ریشه + پسوند", "پیشوند + ریشه + پسوند"]
+        include_prefix = structure in ["پیشوند + ریشه", "پیشوند + ریشه + پسوند", "Prefix + Root", "Prefix + Root + Suffix"]
+        include_suffix = structure in ["ریشه + پسوند", "پیشوند + ریشه + پسوند", "Root + Suffix", "Prefix + Root + Suffix"]
 
         # Always include root
         if st.session_state.get("lock_root"):
@@ -76,16 +65,22 @@ def run_app(is_farsi: bool):
             root = random.choice(affixes["roots"]) if affixes["roots"] else ""
 
         # Handle prefix
-        if st.session_state.get("lock_prefix"):
-            prefix = st.session_state.selected_prefix
+        if include_prefix:
+            if st.session_state.get("lock_prefix"):
+                prefix = st.session_state.selected_prefix
+            else:
+                prefix = random.choice(affixes["prefixes"]) if affixes["prefixes"] else ""
         else:
-            prefix = random.choice(affixes["prefixes"]) if include_prefix and affixes["prefixes"] else ""
+            prefix = ""  # Explicitly clear prefix if not included
 
         # Handle suffix
-        if st.session_state.get("lock_suffix"):
-            suffix = st.session_state.selected_suffix
+        if include_suffix:
+            if st.session_state.get("lock_suffix"):
+                suffix = st.session_state.selected_suffix
+            else:
+                suffix = random.choice(affixes["suffixes"]) if affixes["suffixes"] else ""
         else:
-            suffix = random.choice(affixes["suffixes"]) if include_suffix and affixes["suffixes"] else ""
+            suffix = ""  # Explicitly clear suffix if not included
 
         # Update session state with selected components
         st.session_state.selected_prefix = prefix

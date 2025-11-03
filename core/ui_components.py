@@ -2,22 +2,40 @@ import streamlit as st
 from core.word_builder import combine_affixes
 
 def affix_select_ui(affixes, lang="fa"):
-    # Define labels for multilingual support
+    # Define UI labels for Persian and English, including affix names and word structure
     labels = {
-        "fa": {"prefix": "پیشوند", "root": "ریشه", "suffix": "پسوند", "lock": "🔒 ثابت نگه‌دار", "structure": "ساختار واژه"},
-        "en": {"prefix": "Prefix", "root": "Root", "suffix": "Suffix", "lock": "🔒 Lock", "structure": "Word Structure"}
+        "fa": {
+            "prefix": "پیشوند",
+            "root": "ریشه",
+            "suffix": "پسوند",
+            "lock": "🔒 ثابت نگه‌دار",
+            "structure": "ساختار واژه"
+        },
+        "en": {
+            "prefix": "Prefix",
+            "root": "Root",
+            "suffix": "Suffix",
+            "lock": "🔒 Lock",
+            "structure": "Word Structure"
+        }
+    }
+
+    # Define word structure options for both languages
+    structure_options = {
+        "fa": ["پیشوند + ریشه", "ریشه + پسوند", "پیشوند + ریشه + پسوند"],
+        "en": ["Prefix + Root", "Root + Suffix", "Prefix + Root + Suffix"]
     }
 
     # Display word structure selector above affix selectors
     structure = st.selectbox(
         labels[lang]["structure"],
-        ["پیشوند + ریشه", "ریشه + پسوند", "پیشوند + ریشه + پسوند"],
+        structure_options[lang],
         key="word_structure"
     )
 
-    # Determine which components should be disabled
-    disable_prefix = structure == "ریشه + پسوند"
-    disable_suffix = structure == "پیشوند + ریشه"
+    # Determine which components should be disabled based on structure
+    disable_prefix = structure in ["ریشه + پسوند", "Root + Suffix"]
+    disable_suffix = structure in ["پیشوند + ریشه", "Prefix + Root"]
 
     # Display affix selectors with lock checkboxes in three columns
     col1, col2, col3 = st.columns(3)
