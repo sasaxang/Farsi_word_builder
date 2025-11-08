@@ -8,7 +8,12 @@ st.set_page_config(page_title="Farsi Word Builder", layout="centered")
 # Display compact language selector in top-left corner
 col_lang, col_title = st.columns([1, 5])
 with col_lang:
-    lang = st.selectbox("", ["فارسی", "English"], key="language", label_visibility="collapsed")
+    lang = st.selectbox(
+        "Language Selection",  # Accessible label (hidden visually)
+        ["فارسی", "English"],
+        key="language",
+        label_visibility="collapsed"  # Keeps label for screen readers
+    )
 is_farsi = lang == "فارسی"
 
 # Display responsive app title with minimal top margin
