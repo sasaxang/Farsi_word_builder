@@ -13,6 +13,7 @@ This tool can be used for:
 ## Features
 
 - Slot-machine-style word generator
+- **Bilingual Support**: Interface available in both Persian (Farsi) and English
 - Add new affixes (prefixes, roots, suffixes) directly from the UI
 - Upload affix banks via Excel or JSON files
 - Persistent storage in a local JSON file
@@ -41,19 +42,27 @@ pip install -r requirements.txt
 3. Run the app:
 
 ```bash
-streamlit run app.py
+streamlit run main.py
 ```
 
 ## File Structure
 
 ```
 farsi-word-builder/
-├── app.py                  # Main Streamlit app
+├── core/
+│   ├── __init__.py
+│   ├── affix_manager.py
+│   ├── ui_components.py
+│   └── word_builder.py
 ├── data/
 │   ├── affixes.json        # Default affix bank
 │   └── sample_affixes.xlsx # Sample Excel file for upload
 ├── utils/
-│   └── loader.py           # Utility functions for loading/saving affixes
+│   ├── loader.py           # Utility functions for loading/saving affixes
+│   └── zwnj_rules.py       # Zero-width non-joiner rules
+├── app_en.py               # English version of the app
+├── app_fa.py               # Farsi version of the app
+├── main.py                 # Entry point / Language selector
 ├── requirements.txt        # Python dependencies
 └── README.md               # Project documentation
 ```
@@ -94,4 +103,4 @@ Please make sure your code is clean and documented before submitting.
 
 ## Author
 
-Developed by Sasan — professional translator, voice-over specialist, and creative developer.
+Developed by Sasan — professional English-Farsi translator, localization expert, and creative developer.
