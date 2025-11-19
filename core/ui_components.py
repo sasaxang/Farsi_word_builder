@@ -22,8 +22,8 @@ def affix_select_ui(affixes, lang="fa"):
 
     # Define word structure options for both languages
     structure_options = {
-        "fa": ["پیشوند + ریشه", "ریشه + پسوند", "پیشوند + ریشه + پسوند"],
-        "en": ["Prefix + Root", "Root + Suffix", "Prefix + Root + Suffix"]
+        "fa": ["پیشوند + ریشه (مثل: بی‌گربه)", "ریشه + پسوند (مثل: گربه‌گاه)", "پیشوند + ریشه + پسوند (مثل: خویش‌گربه‌پرداز)"],
+        "en": ["Prefix + Root (e.g. بی‌گربه)", "Root + Suffix (e.g. گربه‌گاه)", "Prefix + Root + Suffix (e.g. خویش‌گربه‌پرداز)"]
     }
 
     # Display word structure selector above affix selectors
@@ -35,40 +35,64 @@ def affix_select_ui(affixes, lang="fa"):
     )
 
     # Determine which components should be disabled based on structure
-    disable_prefix = structure in ["ریشه + پسوند", "Root + Suffix"]
-    disable_suffix = structure in ["پیشوند + ریشه", "Prefix + Root"]
+    disable_prefix = structure in ["ریشه + پسوند (مثل: گربه‌گاه)", "Root + Suffix (e.g. گربه‌گاه)"]
+    disable_suffix = structure in ["پیشوند + ریشه (مثل: بی‌گربه)", "Prefix + Root (e.g. بی‌گربه)"]
 
-    # Display affix selectors with lock checkboxes in three columns
-    col1, col2, col3 = st.columns(3)
+    # Display affix selectors with lock checkboxes in rows (better for mobile)
+    # Layout: [Label] [Dropdown] [Lock]
+    
+    # Helper to render a row
+    def render_row(label, items, key_prefix, key_lock, on_change_func, disabled=False):
+        c1, c2, c3 = st.columns([1.5, 4, 1.5])
+        
+        with c1:
+            # Vertical alignment hack using markdown with some top margin/padding if needed
+            # or just simple text. Using subheader or markdown for bold text.
+            st.markdown(f"<p style='font-weight:bold; margin:0;'>{label}</p>", unsafe_allow_html=True)
+            
+        with c2:
+            st.selectbox(
+                label, # Hidden but good for accessibility if screen reader reads it
+                items,
+                key=key_prefix,
+                on_change=on_change_func,
+                disabled=disabled,
+                label_visibility="collapsed"
+            )
+            
+        with c3:
+            # Checkbox for lock
+            st.checkbox(labels[lang]["lock"], key=key_lock, disabled=disabled)
 
-    with col1:
-        st.selectbox(
-            labels[lang]["prefix"],
-            [""] + affixes["prefixes"],
-            key="selected_prefix",
-            on_change=update_word,
-            disabled=disable_prefix
-        )
-        st.checkbox(labels[lang]["lock"], key="lock_prefix", disabled=disable_prefix)
+    # Prefix Row
+    render_row(
+        labels[lang]["prefix"],
+        [""] + affixes["prefixes"],
+        "selected_prefix",
+        "lock_prefix",
+        update_word,
+        disable_prefix
+    )
 
-    with col2:
-        st.selectbox(
-            labels[lang]["root"],
-            affixes["roots"],
-            key="selected_root",
-            on_change=update_word
-        )
-        st.checkbox(labels[lang]["lock"], key="lock_root")
+    # Root Row
+    render_row(
+        labels[lang]["root"],
+        affixes["roots"],
+        "selected_root",
+        "lock_root",
+        update_word,
+        False # Root is never disabled in current logic
+    )
 
-    with col3:
-        st.selectbox(
-            labels[lang]["suffix"],
-            [""] + affixes["suffixes"],
-            key="selected_suffix",
-            on_change=update_word,
-            disabled=disable_suffix
-        )
-        st.checkbox(labels[lang]["lock"], key="lock_suffix", disabled=disable_suffix)
+    # Suffix Row
+    render_row(
+        labels[lang]["suffix"],
+        [""] + affixes["suffixes"],
+        "selected_suffix",
+        "lock_suffix",
+        update_word,
+        disable_suffix
+    )
 
 def update_word():
     # Combine selected affixes into a single word and store in session state

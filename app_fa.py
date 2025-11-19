@@ -43,6 +43,70 @@ def run_app(is_farsi: bool):
             text-align: right;
             font-family: "Vazir", sans-serif;
         }
+        
+        /* Reduce padding for compact mobile view */
+        .block-container {
+            padding-top: 2rem !important;
+            padding-bottom: 1rem !important;
+        }
+        
+        /* Align checkbox vertically */
+        div[data-testid="stCheckbox"] {
+            padding-top: 8px;
+        }
+        
+        /* Compact rows */
+        div[data-testid="column"] {
+            padding: 0 !important;
+        }
+
+        @media (max-width: 768px) {
+          /* Force horizontal layout */
+          div[data-testid="stHorizontalBlock"] {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 0 !important;
+          }
+
+          /* Remove padding from columns */
+          div[data-testid="column"] {
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+
+          /* Shrink label column */
+          div[data-testid="column"]:nth-of-type(1) {
+            flex: 0 1 auto !important;
+            width: auto !important;
+            white-space: nowrap !important;
+          }
+
+          /* Expand dropdown column */
+          div[data-testid="column"]:nth-of-type(2) {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+          }
+
+          /* Shrink checkbox column */
+          div[data-testid="column"]:nth-of-type(3) {
+            flex: 0 1 auto !important;
+            width: auto !important;
+            white-space: nowrap !important;
+          }
+
+          /* Reduce font size slightly */
+          div[data-testid="column"] * {
+            font-size: 0.85rem !important;
+          }
+
+          /* Prevent horizontal scroll */
+          .main, .block-container {
+            overflow-x: hidden !important;
+          }
+        }
         </style>
     """, unsafe_allow_html=True)
  
@@ -58,11 +122,22 @@ def run_app(is_farsi: bool):
 
     def spin_random(affixes):
         # Retrieve selected word structure from session state
-        structure = st.session_state.get("word_structure", "پیشوند + ریشه + پسوند")
+        # Retrieve selected word structure from session state
+        structure = st.session_state.get("word_structure", "پیشوند + ریشه + پسوند (مثل: خویش‌گربه‌پرداز)")
 
         # Determine which components to include based on selected structure
-        include_prefix = structure in ["پیشوند + ریشه", "پیشوند + ریشه + پسوند", "Prefix + Root", "Prefix + Root + Suffix"]
-        include_suffix = structure in ["ریشه + پسوند", "پیشوند + ریشه + پسوند", "Root + Suffix", "Prefix + Root + Suffix"]
+        include_prefix = structure in [
+            "پیشوند + ریشه (مثل: بی‌گربه)", 
+            "پیشوند + ریشه + پسوند (مثل: خویش‌گربه‌پرداز)", 
+            "Prefix + Root (e.g. بی‌گربه)", 
+            "Prefix + Root + Suffix (e.g. خویش‌گربه‌پرداز)"
+        ]
+        include_suffix = structure in [
+            "ریشه + پسوند (مثل: گربه‌گاه)", 
+            "پیشوند + ریشه + پسوند (مثل: خویش‌گربه‌پرداز)", 
+            "Root + Suffix (e.g. گربه‌گاه)", 
+            "Prefix + Root + Suffix (e.g. خویش‌گربه‌پرداز)"
+        ]
 
         # Always include root
         if st.session_state.get("lock_root"):
@@ -198,5 +273,6 @@ def run_app(is_farsi: bool):
                             final_msg = " ".join([msg for msg in [affix_msg, root_msg] if msg])
 
                         st.success(final_msg)
+                        st.rerun()
                     else:
                         st.warning("هیچ وند یا ریشه‌ای اضافه نشد." if is_farsi else "No affix or root was added.")
