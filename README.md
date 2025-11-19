@@ -18,6 +18,11 @@ This tool can be used for:
 - Persistent storage in a local JSON file
 - Simple and intuitive interface built with Streamlit
 
+## Live App
+You can try Farsi Word Builder directly in your browser via Streamlit:
+
+🔗 https://farsiwordbuilder.streamlit.app/ No installation required—just open the link and start building words interactively.
+
 ## Installation
 
 1. Clone the repository:
@@ -66,16 +71,6 @@ You can upload affix banks in either `.json` or `.xlsx` format.
   "suffixes": ["مند", "گر", "ی"]
 }
 ```
-
-### Excel format:
-
-| prefixes | roots | suffixes |
-|----------|-------|----------|
-| نا       | دان   | مند      |
-| بی       | کار   | گر       |
-| هم       | آگاه  | ی        |
-
-Make sure column names are exactly: `prefixes`, `roots`, and `suffixes`.
 
 ## Usage
 
