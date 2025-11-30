@@ -14,9 +14,19 @@ def smart_join(part1: str, part2: str, is_suffix=False) -> str:
     zwj = "\u200c"
 
     if is_suffix and part2 in NO_ZWJ_SUFFIXES:
+        # Special case for "انه":
+        # If part1 ends in "ه" (but not "اه"), do NOT attach the suffix.
+        # Also do NOT attach if part1 ends in "ا" or "آ".
+        if part2 == "انه":
+            if part1.endswith("ه") and not part1.endswith("اه"):
+                return part1
+            if part1.endswith("ا") or part1.endswith("آ"):
+                return part1
+        
         return part1 + part2
 
     last = part1[-1]
+
     if last in no_zwj_after:
         return part1 + part2
     else:

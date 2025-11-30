@@ -131,7 +131,17 @@ def run_app(is_farsi: bool):
         if st.session_state.get("lock_root"):
             root = st.session_state.selected_root
         else:
-            root = random.choice(affixes["roots"]) if affixes["roots"] else ""
+            # Filter roots if suffix is locked to "انه"
+            if st.session_state.get("lock_suffix") and st.session_state.selected_suffix == "انه":
+                # Exclude roots ending in "ه" (unless "اه"), "ا", or "آ"
+                valid_roots = [r for r in affixes["roots"] if not (
+                    (r.endswith("ه") and not r.endswith("اه")) or 
+                    r.endswith("ا") or 
+                    r.endswith("آ")
+                )]
+                root = random.choice(valid_roots) if valid_roots else ""
+            else:
+                root = random.choice(affixes["roots"]) if affixes["roots"] else ""
 
         # Handle prefix
         if include_prefix:
@@ -147,7 +157,12 @@ def run_app(is_farsi: bool):
             if st.session_state.get("lock_suffix"):
                 suffix = st.session_state.selected_suffix
             else:
-                suffix = random.choice(affixes["suffixes"]) if affixes["suffixes"] else ""
+                # Filter suffixes if root ends in "ه" (but not "اه"), "ا", or "آ"
+                if root and ((root.endswith("ه") and not root.endswith("اه")) or root.endswith("ا") or root.endswith("آ")):
+                    valid_suffixes = [s for s in affixes["suffixes"] if s != "انه"]
+                    suffix = random.choice(valid_suffixes) if valid_suffixes else ""
+                else:
+                    suffix = random.choice(affixes["suffixes"]) if affixes["suffixes"] else ""
         else:
             suffix = ""  # Explicitly clear suffix if not included
 
