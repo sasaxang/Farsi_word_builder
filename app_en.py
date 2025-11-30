@@ -57,6 +57,11 @@ def run_app(is_farsi: bool):
             padding-top: 8px;
         }
         
+        /* Add spacing between checkbox label and checkbox */
+        div[data-testid="stCheckbox"] label {
+            gap: 0.5rem;
+        }
+        
         /* Compact rows */
         div[data-testid="column"] {
             padding: 0 !important;
