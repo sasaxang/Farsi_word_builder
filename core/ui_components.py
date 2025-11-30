@@ -1,20 +1,35 @@
 import streamlit as st
 from core.word_builder import combine_affixes
+from utils.combinations import convert_to_persian_numerals
 
 def affix_select_ui(affixes, lang="fa"):
     # Define UI labels for Persian and English, including affix names and word structure
+    # Add counts to labels
+    prefix_count = len(affixes.get("prefixes", []))
+    root_count = len(affixes.get("roots", []))
+    suffix_count = len(affixes.get("suffixes", []))
+    
+    if lang == "fa":
+        prefix_label = f"پیشوند ({convert_to_persian_numerals(prefix_count)} مورد)"
+        root_label = f"ریشه ({convert_to_persian_numerals(root_count)} مورد)"
+        suffix_label = f"پسوند ({convert_to_persian_numerals(suffix_count)} مورد)"
+    else:
+        prefix_label = f"Prefix ({prefix_count})"
+        root_label = f"Root ({root_count})"
+        suffix_label = f"Suffix ({suffix_count})"
+    
     labels = {
         "fa": {
-            "prefix": "پیشوند",
-            "root": "ریشه",
-            "suffix": "پسوند",
+            "prefix": prefix_label,
+            "root": root_label,
+            "suffix": suffix_label,
             "lock": "ثابت نگه‌دار",
             "structure": "ساختار واژه"
         },
         "en": {
-            "prefix": "Prefix",
-            "root": "Root",
-            "suffix": "Suffix",
+            "prefix": prefix_label,
+            "root": root_label,
+            "suffix": suffix_label,
             "lock": "Lock",
             "structure": "Word Structure"
         }

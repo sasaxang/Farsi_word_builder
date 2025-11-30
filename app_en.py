@@ -3,6 +3,7 @@ import random
 from core.affix_manager import load_affixes, save_affixes, merge_affixes
 from core.ui_components import affix_select_ui, update_word, display_word
 from utils.loader import save_affixes_json
+from utils.combinations import calculate_total_combinations, convert_to_persian_numerals
 import re
 from core.word_builder import combine_affixes
 
@@ -180,8 +181,20 @@ def run_app(is_farsi: bool):
     # Display the generated word
     display_word()
 
-    # Random word generation button
-    st.button("تصادفی بساز!" if is_farsi else "Spin Random!", on_click=lambda: spin_random(affixes))
+    # Random word generation button with total combinations count
+    # Calculate total combinations based on current structure
+    current_structure = st.session_state.get("word_structure", "Prefix + Root + Suffix (e.g. خویش‌گربه‌پرداز)")
+    total_combinations = calculate_total_combinations(affixes, current_structure)
+    
+    col1, col2 = st.columns([3, 2])
+    
+    with col1:
+        # Display total combinations count
+        combinations_text = f"Total Possible Combinations: {total_combinations}"
+        st.markdown(f"<p style='margin-top: 8px; font-size: 0.9rem;'>{combinations_text}</p>", unsafe_allow_html=True)
+    
+    with col2:
+        st.button("تصادفی بساز!" if is_farsi else "Spin Random!", on_click=lambda: spin_random(affixes))
 
     # Initialize show_add_form state if not present
     if "show_add_form" not in st.session_state:
