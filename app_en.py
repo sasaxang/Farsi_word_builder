@@ -168,27 +168,32 @@ def run_app(is_farsi: bool):
     # Random word generation button
     st.button("تصادفی بساز!" if is_farsi else "Spin Random!", on_click=lambda: spin_random(affixes))
 
-    # Toggle to show the add affix form
-    if st.button("➕ افزودن وند" if is_farsi else "➕ Add Affix"):
-        st.session_state.show_add_form = True
+    # Initialize show_add_form state if not present
+    if "show_add_form" not in st.session_state:
+        st.session_state.show_add_form = False
+
+    def toggle_add_form():
+        st.session_state.show_add_form = not st.session_state.show_add_form
+
+    # Toggle button with dynamic label
+    if is_farsi:
+        btn_label = "➖ افزودن وند" if st.session_state.show_add_form else "➕ افزودن وند"
+    else:
+        btn_label = "➖ Add Affix" if st.session_state.show_add_form else "➕ Add Affix"
+
+    st.button(btn_label, on_click=toggle_add_form)
 
     # Add affix form
-    if st.session_state.get("show_add_form", True):  # default to open
+    if st.session_state.show_add_form:
         with st.form("add_affix"):
             new_prefix = st.text_input("پیشوند جدید" if is_farsi else "New Prefix")
             new_root = st.text_input("ریشه جدید" if is_farsi else "New Root")
             new_suffix = st.text_input("پسوند جدید" if is_farsi else "New Suffix")
 
-            col1, col2 = st.columns(2)
-            with col1:
-                submitted = st.form_submit_button("✅ افزودن" if is_farsi else "✅ Add")
-            with col2:
-                close = st.form_submit_button("❌ بستن فرم" if is_farsi else "❌ Close Form")
+            # Single submit button, no close button
+            submitted = st.form_submit_button("✅ افزودن" if is_farsi else "✅ Add")
 
-            if close:
-                st.session_state.show_add_form = False
-
-            elif submitted:
+            if submitted:
                 errors = []
                 invalid_fields = []
 
