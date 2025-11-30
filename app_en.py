@@ -42,7 +42,7 @@ def run_app(is_farsi: bool):
         <style>
         /* Reduce padding for compact mobile view */
         .block-container {
-            padding-top: 2rem !important;
+            padding-top: 4.5rem !important;
             padding-bottom: 1rem !important;
         }
         
@@ -57,44 +57,25 @@ def run_app(is_farsi: bool):
         }
 
         @media (max-width: 768px) {
-          /* Force horizontal layout */
+          /* Reduce top padding to ensure title is visible */
+          .block-container {
+            padding-top: 3.5rem !important;
+          }
+          
+          /* Ensure title and language selector remain visible */
           div[data-testid="stHorizontalBlock"] {
             display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
-            justify-content: flex-start !important;
-            gap: 0 !important;
+            flex-wrap: wrap !important;
           }
 
-          /* Remove padding from columns */
+          /* For 3-column layouts (affix selectors), make them more compact */
           div[data-testid="column"] {
-            padding: 0 !important;
-            margin: 0 !important;
+            padding: 0.2rem !important;
           }
 
-          /* Shrink label column */
-          div[data-testid="column"]:nth-of-type(1) {
-            flex: 0 1 auto !important;
-            width: auto !important;
-            white-space: nowrap !important;
-          }
-
-          /* Expand dropdown column */
-          div[data-testid="column"]:nth-of-type(2) {
-            flex: 1 1 auto !important;
-            min-width: 0 !important;
-          }
-
-          /* Shrink checkbox column */
-          div[data-testid="column"]:nth-of-type(3) {
-            flex: 0 1 auto !important;
-            width: auto !important;
-            white-space: nowrap !important;
-          }
-
-          /* Reduce font size slightly */
-          div[data-testid="column"] * {
+          /* Reduce font size slightly for better fit */
+          div[data-testid="stSelectbox"] label,
+          div[data-testid="stCheckbox"] label {
             font-size: 0.85rem !important;
           }
 
