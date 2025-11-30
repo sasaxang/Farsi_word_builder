@@ -26,13 +26,20 @@ def affix_select_ui(affixes, lang="fa"):
         "en": ["Prefix + Root (e.g. بی‌گربه)", "Root + Suffix (e.g. گربه‌گاه)", "Prefix + Root + Suffix (e.g. خویش‌گربه‌پرداز)"]
     }
 
-    # Display word structure selector above affix selectors
-    structure = st.selectbox(
-        labels[lang]["structure"],
-        structure_options[lang],
-        index=2,
-        key="word_structure"
-    )
+    # Display word structure selector in a row (Label | Dropdown)
+    c1, c2, c3 = st.columns([1.5, 4, 1.5])
+    
+    with c1:
+        st.markdown(f"<p style='font-weight:bold; margin:0;'>{labels[lang]['structure']}</p>", unsafe_allow_html=True)
+        
+    with c2:
+        structure = st.selectbox(
+            labels[lang]["structure"],
+            structure_options[lang],
+            index=2,
+            key="word_structure",
+            label_visibility="collapsed"
+        )
 
     # Determine which components should be disabled based on structure
     disable_prefix = structure in ["ریشه + پسوند (مثل: گربه‌گاه)", "Root + Suffix (e.g. گربه‌گاه)"]
