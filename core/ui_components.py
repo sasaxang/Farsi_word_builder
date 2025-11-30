@@ -26,7 +26,7 @@ def affix_select_ui(affixes, lang="fa"):
         "en": ["Prefix + Root (e.g. بی‌گربه)", "Root + Suffix (e.g. گربه‌گاه)", "Prefix + Root + Suffix (e.g. خویش‌گربه‌پرداز)"]
     }
 
-    # Display word structure selector in a row (Label | Dropdown)
+    # Display word structure selector in a row (Label | Dropdown | Nominal Form Checkbox)
     c1, c2, c3 = st.columns([1.5, 4, 1.5])
     
     with c1:
@@ -40,6 +40,11 @@ def affix_select_ui(affixes, lang="fa"):
             key="word_structure",
             label_visibility="collapsed"
         )
+        
+    with c3:
+        # Nominal Form Checkbox
+        nominal_label = "حالت اسمی" if lang == "fa" else "Nominal Form"
+        st.checkbox(nominal_label, key="is_nominal", on_change=update_word)
 
     # Determine which components should be disabled based on structure
     disable_prefix = structure in ["ریشه + پسوند (مثل: گربه‌گاه)", "Root + Suffix (e.g. گربه‌گاه)"]
@@ -70,6 +75,7 @@ def affix_select_ui(affixes, lang="fa"):
         with c3:
             # Checkbox for lock
             st.checkbox(labels[lang]["lock"], key=key_lock, disabled=disabled)
+
 
     # Prefix Row
     render_row(
@@ -106,7 +112,8 @@ def update_word():
     word = combine_affixes(
         st.session_state.selected_prefix,
         st.session_state.selected_root,
-        st.session_state.selected_suffix
+        st.session_state.selected_suffix,
+        st.session_state.get("is_nominal", False)
     )
     st.session_state.word_parts = {
         "prefix": st.session_state.selected_prefix,
