@@ -21,7 +21,7 @@ def run_app(is_farsi: bool):
         .fancy-word {
             text-align: center;
             direction: lrt;
-            font-size: 48px;
+            font-size: clamp(24px, 8vw, 48px);
             font-weight: bold;
             color: #ffffff;
             background-color: #4A90E2;
@@ -30,6 +30,12 @@ def run_app(is_farsi: bool):
             font-family: "Vazir", "Comic Sans MS", cursive;
             animation: pop 0.6s ease-out;
             margin-bottom: 32px;
+            word-break: keep-all;
+            overflow-wrap: normal;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         @keyframes pop {
