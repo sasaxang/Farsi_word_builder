@@ -12,8 +12,11 @@ def is_farsi_text(text):
     """Check if the input contains at least one Persian character."""
     return bool(re.search(r'[\u0600-\u06FF]', text))
 
+import os
+
 def run_app(is_farsi: bool):
-    DATA_PATH = "data/affixes.json"
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    DATA_PATH = os.path.join(current_dir, "data", "affixes.json")
     st.set_page_config(page_title="Persian Word Spinner", layout="centered")
 
     # ✅ Inject custom CSS
