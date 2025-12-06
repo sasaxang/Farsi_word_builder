@@ -21,13 +21,35 @@ def run_app(is_farsi: bool):
     # ✅ Inject custom CSS
     st.markdown("""
         <style>
+        /* Custom Color Theme */
+        :root {
+            --bg-cream: #F5F1E8;
+            --accent-orange: #F39C12;
+            --text-dark: #1A1A1A;
+            --grid-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Background with grid pattern */
+        .stApp {
+            background-color: var(--bg-cream);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Override Streamlit's default background */
+        .main {
+            background-color: transparent;
+        }
+        
         .fancy-word {
             text-align: center;
             direction: rtl;
             font-size: clamp(24px, 8vw, 48px);
             font-weight: bold;
             color: #ffffff;
-            background-color: #4A90E2;
+            background-color: var(--accent-orange);
             padding: 12px 24px;
             border-radius: 12px;
             font-family: "Vazir", "Comic Sans MS", cursive;
@@ -39,6 +61,7 @@ def run_app(is_farsi: bool):
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         @keyframes pop {
