@@ -128,6 +128,8 @@ def run_app(is_farsi: bool):
             [data-testid="stSidebar"] {
                 overflow-y: auto !important;
                 max-height: 100vh !important;
+                min-width: 85vw !important;
+                width: 85vw !important;
             }
             
             [data-testid="stSidebar"] .block-container {
