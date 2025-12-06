@@ -139,7 +139,7 @@ def show_auth_ui(lang="fa"):
                 use_container_width=True,
                 type="primary"
             ):
-                st.login()
+                st.login("google")
         
         return False
 
