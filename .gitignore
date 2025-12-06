@@ -15,8 +15,8 @@ miniconda3/
 */site-packages/
 
 # Streamlit config and secrets
-.streamlit/config.toml
-.streamlit/secrets.toml
+# .streamlit/config.toml # Commented out to allow theme config to be tracked
+**/secrets.toml
 
 # Firebase credentials
 streamlit-app/config/firebase-credentials.json

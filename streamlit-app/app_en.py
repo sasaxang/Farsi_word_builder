@@ -17,7 +17,6 @@ import os
 def run_app(is_farsi: bool):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     DATA_PATH = os.path.join(current_dir, "data", "affixes.json")
-    st.set_page_config(page_title="Persian Word Spinner", layout="centered")
 
     # ✅ Inject custom CSS
     st.markdown("""
@@ -76,9 +75,19 @@ def run_app(is_farsi: bool):
             color: var(--text-dark) !important;
         }
         
-        /* Enforce Vazir font universally */
-        * {
+        /* Enforce Vazir font - safely excluding icons */
+        /* We target the main container for inheritance, and specific text elements */
+        [data-testid="stAppViewContainer"] {
             font-family: "Vazir", sans-serif !important;
+        }
+        
+        button, input, select, textarea, label, p, h1, h2, h3, h4, h5, h6, a, li {
+            font-family: "Vazir", sans-serif !important;
+        }
+        
+        /* Explicitly exclude material icons and symbols from Vazir enforcement */
+        .material-icons, .material-symbols-rounded, .material-symbols-outlined {
+            font-family: 'Material Icons' !important;
         }
         
         /* Override Streamlit's dark mode text colors - ONLY for main content */
@@ -110,27 +119,43 @@ def run_app(is_farsi: bool):
         
         /* Sidebar fixes for all screen sizes */
         [data-testid="stSidebar"] {
-            overflow-y: auto !important;
-            max-height: 100vh !important;
-            min-width: 320px !important;
+            left: 0 !important;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            min-width: 300px !important; /* Prevent squashed sidebar */
+            max-width: 350px !important;
+            background-color: #f5f5f5 !important; /* Force light background */
         }
         
         [data-testid="stSidebar"] .block-container {
             padding: 1rem !important;
         }
         
-        /* Make sidebar content visible and scrollable */
-        [data-testid="stSidebar"] > div {
-            overflow-y: auto !important;
+        /* Desktop-specific sidebar fixes (Sticky/Fixed position) */
+        @media (min-width: 769px) {
+            [data-testid="stSidebar"] {
+                position: fixed !important;
+                height: 100vh !important;
+                overflow-y: auto !important;
+                z-index: 9991 !important;
+            }
         }
         
         /* Mobile sidebar fixes */
         @media (max-width: 768px) {
-            [data-testid="stSidebar"] {
-                overflow-y: auto !important;
-                max-height: 100vh !important;
-                min-width: 85vw !important;
+            /* Only apply positioning when sidebar is NOT collapsed */
+            [data-testid="stSidebar"]:not([aria-expanded="false"]) {
+                left: 0 !important;
+                margin-left: 0 !important;
+                padding-left: 0 !important;
+                min-width: 85vw !important; /* Full width on mobile */
                 width: 85vw !important;
+                z-index: 999999 !important;
+            }
+            
+            /* Ensure collapsed sidebar is truly hidden */
+            [data-testid="stSidebar"][aria-expanded="false"] {
+                display: none !important;
             }
             
             [data-testid="stSidebar"] .block-container {
@@ -150,6 +175,38 @@ def run_app(is_farsi: bool):
                 margin-bottom: 0.5rem !important;
             }
         }
+        
+        /* Force text color everywhere to prevent "Dark Mode" text issues */
+        .stApp, .stApp p, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp span, .stApp div {
+             color: var(--text-dark) !important;
+        }
+        
+        /* Specific overrides for inputs/selects to ensure they are readable */
+        .stSelectbox > div > div {
+             color: var(--text-dark) !important;
+             background-color: white !important;
+        }
+        
+        /* Fix Checkboxes */
+        label[data-testid="stCheckbox"] span {
+            color: var(--text-dark) !important;
+        }
+        [data-testid="stCheckbox"] div[role="checkbox"] {
+            background-color: white !important;
+            border-color: #ccc !important;
+        }
+        [data-testid="stCheckbox"] div[role="checkbox"][aria-checked="true"] {
+            background-color: var(--accent-orange) !important;
+            border-color: var(--accent-orange) !important;
+        }
+
+        /* Fix Text Inputs */
+        input.st-ai, input.st-ah {
+            color: var(--text-dark) !important;
+            background-color: white !important;
+        }
+
+
 
         </style>
         

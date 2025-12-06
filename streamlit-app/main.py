@@ -4,18 +4,20 @@ from app_en import run_app as run_en
 from config.firebase_config import initialize_firebase
 from core.auth import show_auth_ui, init_auth_state
 
-# Initialize Firebase (only once)
-try:
-    initialize_firebase()
-except Exception as e:
-    st.error(f"Failed to initialize Firebase: {e}")
-    st.stop()
+# Set page configuration (must be first Streamlit command)
+st.set_page_config(page_title="Farsi Word Builder", layout="centered")
+
+# Initialize Firebase only once using session state
+if 'firebase_initialized' not in st.session_state:
+    try:
+        initialize_firebase()
+        st.session_state.firebase_initialized = True
+    except Exception as e:
+        st.error(f"Failed to initialize Firebase: {e}")
+        st.stop()
 
 # Initialize authentication state
 init_auth_state()
-
-# Set page configuration
-st.set_page_config(page_title="Farsi Word Builder", layout="centered")
 
 # Add custom CSS for language toggle button
 st.markdown("""

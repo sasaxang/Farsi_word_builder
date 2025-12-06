@@ -1,7 +1,6 @@
 import streamlit as st
 from firebase_admin import auth, firestore
 from datetime import datetime
-import hashlib
 
 def init_auth_state():
     """Initialize authentication session state"""
@@ -12,104 +11,137 @@ def init_auth_state():
     if 'user_email' not in st.session_state:
         st.session_state.user_email = None
 
-def create_user_document(user_id, email, display_name):
-    """Create initial user document in Firestore"""
+def sync_google_user_to_firebase(google_user_info):
+    """
+    Sync Google OAuth user to Firebase Firestore.
+    Creates or updates user document based on Google account info.
+    """
     try:
         db = firestore.client()
+        email = google_user_info.get('email')
+        name = google_user_info.get('name', email)
+        
+        # Use email as the document ID for easy lookup
+        # Replace @ and . with _ to make it a valid Firestore document ID
+        user_id = email.replace('@', '_').replace('.', '_')
+        
         user_ref = db.collection('users').document(user_id)
+        user_doc = user_ref.get()
         
-        # Check if user already exists
-        if user_ref.get().exists:
-            return True
-        
-        # Create new user document
-        user_ref.set({
-            'email': email,
-            'display_name': display_name,
-            'created_at': datetime.now(),
-            'favorites': [],
-            'custom_affixes': {
-                'prefixes': [],
-                'roots': [],
-                'suffixes': []
-            }
-        })
-        return True
-    except Exception as e:
-        st.error(f"Failed to create user document: {e}")
-        return False
-
-def register_user(email, password, display_name):
-    """Register a new user with Firebase Auth"""
-    try:
-        # Create user in Firebase Auth
-        user = auth.create_user(
-            email=email,
-            password=password,
-            display_name=display_name
-        )
-        
-        # Create user document in Firestore
-        if create_user_document(user.uid, email, display_name):
-            st.success(f"✅ Account created successfully! Welcome, {display_name}!")
-            return user
+        if user_doc.exists:
+            # Update last login time
+            user_ref.update({
+                'last_login': datetime.now(),
+                'name': name  # Update name in case it changed
+            })
         else:
-            # Rollback: delete the auth user if Firestore creation fails
-            auth.delete_user(user.uid)
-            st.error("❌ Failed to complete registration. Please try again.")
-            return None
-            
-    except auth.EmailAlreadyExistsError:
-        st.error("❌ This email is already registered. Please login instead.")
-        return None
+            # Create new user document
+            user_ref.set({
+                'email': email,
+                'name': name,
+                'display_name': name,
+                'created_at': datetime.now(),
+                'last_login': datetime.now(),
+                'favorites': [],
+                'custom_affixes': {
+                    'prefixes': [],
+                    'roots': [],
+                    'suffixes': []
+                }
+            })
+        
+        return user_id
     except Exception as e:
-        st.error(f"❌ Registration failed: {str(e)}")
+        st.error(f"Failed to sync user to Firebase: {e}")
         return None
 
-def verify_user_credentials(email, password):
-    """
-    Verify user credentials using Firebase Auth REST API.
-    Firebase Admin SDK doesn't support email/password login directly,
-    so we check if user exists and verify via custom token approach.
-    """
-    try:
-        # Get user by email
-        user = auth.get_user_by_email(email)
-        
-        # For production, you'd use Firebase Auth REST API here
-        # For now, we'll use a simplified approach with custom tokens
-        # Generate custom token for the user
-        custom_token = auth.create_custom_token(user.uid)
-        
-        return user
-    except auth.UserNotFoundError:
-        st.error("❌ No account found with this email.")
-        return None
-    except Exception as e:
-        st.error(f"❌ Login failed: {str(e)}")
-        return None
-
-def login_user(email, password):
-    """Login user and create session"""
-    user = verify_user_credentials(email, password)
+def show_auth_ui(lang="fa"):
+    """Display Google OAuth authentication UI or User Dashboard"""
+    init_auth_state()
     
-    if user:
-        # Set session state
-        st.session_state.user = user
-        st.session_state.user_id = user.uid
-        st.session_state.user_email = user.email
-        st.success(f"✅ Welcome back, {user.display_name or email}!")
-        st.rerun()
+    # Check if user is logged in with Google OAuth
+    # st.user exists but may not have is_logged_in in older versions
+    is_logged_in = hasattr(st, 'user') and hasattr(st.user, 'email') and st.user.email
+    
+    if is_logged_in:
+        # Sync to Firebase on first login or if not synced
+        if not st.session_state.user_id or st.session_state.user_email != st.user.email:
+            user_id = sync_google_user_to_firebase(st.user)
+            if user_id:
+                st.session_state.user_id = user_id
+                st.session_state.user_email = st.user.email
+                st.session_state.user = st.user
+        
+        # --- USER DASHBOARD ---
+        with st.sidebar:
+            st.markdown("---")
+            st.subheader(f"👋 {'سلام' if lang == 'fa' else 'Welcome'}, {st.user.name.split()[0]}!")
+            
+            # Status Badge
+            st.success("✅ " + ("شما وارد شده‌اید" if lang == "fa" else "You are logged in"))
+            
+            # User Info
+            with st.expander("👤 " + ("اطلاعات حساب" if lang == "fa" else "Account Info")):
+                st.caption(st.user.email)
+                # Future: Add stats here?
+            
+            # Favorites Section
+            favorites_label = "❤️ " + ("واژه‌های محبوب" if lang == "fa" else "My Favorites")
+            with st.expander(favorites_label, expanded=True):
+                # Fetch fresh data
+                user_data = get_user_data(st.session_state.user_id)
+                favorites = user_data.get('favorites', []) if user_data else []
+                
+                if favorites:
+                    for item in favorites:
+                        # Handle both string (legacy) and dict (new) formats
+                        if isinstance(item, dict):
+                            word_text = item.get('word', 'Unknown')
+                            # Optional: Show components tooltip or subtext
+                            # prefix = item.get('prefix', '')
+                            # root = item.get('root', '')
+                            # suffix = item.get('suffix', '')
+                        else:
+                            word_text = str(item)
+                            
+                        st.markdown(f"- **{word_text}**")
+                else:
+                    st.info("هنوز واژه‌ای ذخیره نکرده‌اید" if lang == "fa" else "No saved words yet")
+            
+            st.markdown("---")
+            
+            # Logout Button
+            if st.button("🚪 " + ("خروج از حساب" if lang == "fa" else "Sign Out"), use_container_width=True):
+                st.logout()
         return True
-    return False
-
-def logout_user():
-    """Clear user session"""
-    st.session_state.user = None
-    st.session_state.user_id = None
-    st.session_state.user_email = None
-    st.success("👋 Logged out successfully!")
-    st.rerun()
+    
+    else:
+        # --- LOGIN UI ---
+        with st.sidebar:
+            st.subheader("🔐 " + ("ورود به حساب" if lang == "fa" else "Login"))
+            st.markdown("---")
+            
+            description = (
+                "برای ذخیره واژه‌ها و دسترسی به امکانات بیشتر وارد شوید" 
+                if lang == "fa" 
+                else "Sign in to save your favorite words and access more features"
+            )
+            
+            st.markdown(f"""
+                <div style='text-align: center; margin-bottom: 1rem; color: #666;'>
+                    <small>{description}</small>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Google Sign-In button
+            if st.button(
+                "🔐 " + ("ورود با گوگل" if lang == "fa" else "Sign in with Google"),
+                use_container_width=True,
+                type="primary"
+            ):
+                st.login()
+        
+        return False
 
 def get_user_data(user_id):
     """Get user data from Firestore"""
@@ -122,59 +154,3 @@ def get_user_data(user_id):
     except Exception as e:
         st.error(f"Failed to fetch user data: {e}")
         return None
-
-def show_auth_ui(lang="fa"):
-    """Display authentication UI (login/register)"""
-    init_auth_state()
-    
-    # If user is logged in, show logout button
-    if st.session_state.user:
-        with st.sidebar:
-            st.success(f"👤 {st.session_state.user_email}")
-            if st.button("🚪 خروج" if lang == "fa" else "🚪 Logout", use_container_width=True):
-                logout_user()
-        return True
-    
-    # Show login/register form
-    with st.sidebar:
-        st.subheader("🔐 ورود / ثبت‌نام" if lang == "fa" else "🔐 Login / Register")
-        
-        tab1, tab2 = st.tabs(["ورود" if lang == "fa" else "Login", "ثبت‌نام" if lang == "fa" else "Register"])
-        
-        with tab1:
-            with st.form("login_form"):
-                email = st.text_input("ایمیل" if lang == "fa" else "Email", key="login_email")
-                password = st.text_input("رمز عبور" if lang == "fa" else "Password", type="password", key="login_password")
-                submit = st.form_submit_button("ورود" if lang == "fa" else "Login", use_container_width=True)
-                
-                if submit:
-                    if email and password:
-                        login_user(email, password)
-                    else:
-                        st.error("لطفا تمام فیلدها را پر کنید" if lang == "fa" else "Please fill all fields")
-        
-        with tab2:
-            with st.form("register_form"):
-                name = st.text_input("نام" if lang == "fa" else "Name", key="register_name")
-                email = st.text_input("ایمیل" if lang == "fa" else "Email", key="register_email")
-                password = st.text_input("رمز عبور" if lang == "fa" else "Password", type="password", key="register_password")
-                password_confirm = st.text_input("تکرار رمز عبور" if lang == "fa" else "Confirm Password", type="password", key="register_password_confirm")
-                submit = st.form_submit_button("ثبت‌نام" if lang == "fa" else "Register", use_container_width=True)
-                
-                if submit:
-                    if not all([name, email, password, password_confirm]):
-                        st.error("لطفا تمام فیلدها را پر کنید" if lang == "fa" else "Please fill all fields")
-                    elif password != password_confirm:
-                        st.error("رمز عبور و تکرار آن یکسان نیستند" if lang == "fa" else "Passwords do not match")
-                    elif len(password) < 6:
-                        st.error("رمز عبور باید حداقل ۶ کاراکتر باشد" if lang == "fa" else "Password must be at least 6 characters")
-                    else:
-                        user = register_user(email, password, name)
-                        if user:
-                            # Auto-login after registration
-                            st.session_state.user = user
-                            st.session_state.user_id = user.uid
-                            st.session_state.user_email = user.email
-                            st.rerun()
-    
-    return False
