@@ -74,6 +74,11 @@ def run_app(is_farsi: bool):
         .stApp, .main, body {
             color: var(--text-dark) !important;
         }
+
+        /* Enforce Vazir font universally */
+        * {
+            font-family: "Vazir", sans-serif !important;
+        }
         
         /* Override Streamlit's dark mode text colors */
         label, p, span, div {

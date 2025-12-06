@@ -76,6 +76,11 @@ def run_app(is_farsi: bool):
             font-family: "Vazir", sans-serif;
         }
         
+        /* Enforce Vazir font universally */
+        * {
+            font-family: "Vazir", sans-serif !important;
+        }
+        
         /* Force dark text for readability on cream background */
         .stApp, .main, body {
             color: var(--text-dark) !important;
