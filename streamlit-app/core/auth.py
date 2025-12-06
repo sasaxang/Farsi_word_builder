@@ -78,14 +78,14 @@ def show_auth_ui(lang="fa"):
         if st.session_state.user_id:
             with st.sidebar:
                 st.markdown("---")
-                st.success(f"سلام {st.user.name or st.user.email}!" if lang == "fa" else f"Welcome {st.user.name or st.user.email}!")
+                st.success(f"سلام، {st.user.name or st.user.email}!" if lang == "fa" else f"Welcome {st.user.name or st.user.email}!")
                 
                 with st.expander("👤 " + ("پروفایل من" if lang == "fa" else "My Profile")):
                     st.markdown(f"**{st.user.name}**")
                     st.caption(st.user.email)
                 
                 # Favorites Section
-                favorites_label = "❤️ " + ("واژه‌های محبوب" if lang == "fa" else "My Favorites")
+                favorites_label = "❤️ " + ("واژه‌های محبوب من" if lang == "fa" else "My Favorites")
                 with st.expander(favorites_label, expanded=True):
                     # Fetch fresh data
                     favorites = get_favorites(st.session_state.user_id)
@@ -117,7 +117,7 @@ def show_auth_ui(lang="fa"):
                 st.markdown("---")
                 
                 # Logout Button
-                if st.button("🚪 " + ("خروج از حساب" if lang == "fa" else "Sign Out"), use_container_width=True):
+                if st.button(("خروج از حساب" if lang == "fa" else "Sign Out"), use_container_width=True):
                     st.logout()
         return True
     
