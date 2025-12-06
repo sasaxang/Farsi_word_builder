@@ -69,6 +69,21 @@ def run_app(is_farsi: bool):
             0% { transform: scale(0.8); opacity: 0.5; }
             100% { transform: scale(1); opacity: 1; }
         }
+        
+        /* Force dark text for readability on cream background */
+        .stApp, .main, body {
+            color: var(--text-dark) !important;
+        }
+        
+        /* Override Streamlit's dark mode text colors */
+        label, p, span, div {
+            color: var(--text-dark) !important;
+        }
+        
+        /* Ensure input fields have dark text */
+        input, textarea, select {
+            color: var(--text-dark) !important;
+        }
 
         </style>
         
