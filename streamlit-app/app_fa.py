@@ -98,6 +98,17 @@ def run_app(is_farsi: bool):
         
         /* Override Streamlit's dark mode text colors - ONLY for main content */
         .main label, 
+        .affix-label {
+            color: var(--text-dark) !important;
+        }
+
+        /* Affix Label alignment */
+        .affix-label {
+            font-weight: bold;
+            margin: 0 !important;
+            padding-top: 25px; /* Desktop default alignment */
+            white-space: nowrap; /* Prevent text wrapping */
+        } 
         .main p:not([data-testid="stMarkdownContainer"] p), 
         .main span, 
         .main div:not([data-testid="stVerticalBlock"]) {
@@ -179,6 +190,19 @@ def run_app(is_farsi: bool):
             [data-testid="stSidebar"] .block-container {
                 padding: 1rem 0.5rem !important;
             }
+
+            /* Compact Favorites List: Remove inner gaps and margins */
+            [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+                gap: 0.2rem !important;
+            }
+            [data-testid="stSidebar"] p {
+                margin-bottom: 0.1rem !important;
+                margin-top: 0.1rem !important;
+            }
+            [data-testid="stSidebar"] hr {
+                margin-top: 0.5rem !important;
+                margin-bottom: 0.5rem !important;
+            }
             
             /* Make form elements more compact on mobile */
             [data-testid="stSidebar"] input,
@@ -242,20 +266,7 @@ def run_app(is_farsi: bool):
             gap: 0.5rem;
         }
         
-        /* Compact rows */
-        div[data-testid="column"] {
-            padding: 0 !important;
-        }
-        
-        /* Minimize button spacing */
-        div[data-testid="stButton"] {
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-        }
-        
-        button {
-            margin: 0 !important;
-        }
+
 
         @media (max-width: 768px) {
           /* Reduce top padding to ensure title is visible */
@@ -263,27 +274,66 @@ def run_app(is_farsi: bool):
             padding-top: 3.5rem !important;
           }
           
-          /* Ensure title and language selector remain visible */
+          /* Force columns to stay in a row (prevent stacking) */
           div[data-testid="stHorizontalBlock"] {
             display: flex !important;
-            flex-wrap: wrap !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 2px !important; /* Minimal gap to prevent "large gap" issues */
           }
 
-          /* For 3-column layouts (affix selectors), make them more compact */
-          div[data-testid="column"] {
-            padding: 0.2rem !important;
-          }
+
 
           /* Reduce font size slightly for better fit */
           div[data-testid="stSelectbox"] label,
-          div[data-testid="stCheckbox"] label {
-            font-size: 0.85rem !important;
+          div[data-testid="stCheckbox"] label,
+          .affix-label {
+            font-size: 0.8rem !important;
+            padding-top: 0 !important; /* Remove fixed padding on mobile, rely on flex align */
           }
 
           /* Prevent horizontal scroll */
           .main, .block-container {
             overflow-x: hidden !important;
           }
+        }
+
+        /* ---------------------------------------------------------------------- */
+        /* GLOBAL LAYOUT STABILITY FOR AFFIX ROWS (Label | Input | Lock)          */
+        /* ---------------------------------------------------------------------- */
+        /* These rules apply at ALL screen widths to prevent "jumping" layout      */
+        /* and ensure the controls always sit in a single compact row.            */
+
+        /* Target the horizontal block containing our specific columns */
+        div[data-testid="stHorizontalBlock"]:has(.affix-label) {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 2px !important;
+        }
+
+        /* SMART COLUMN SIZING (Safe targeting using :has) */
+        
+        /* Column 1 (Label): identified by having .affix-label class */
+        div[data-testid="column"]:has(.affix-label) {
+            flex: 0 1 auto !important;
+            width: auto !important;
+            min-width: auto !important;
+        }
+        
+        /* Column 2 (Dropdown): identified by having selectbox and NO label class */
+        div[data-testid="column"]:has(div[data-testid="stSelectbox"]) {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+        }
+        
+        /* Column 3 (Lock/Nominal): identified by having checkbox */
+        div[data-testid="column"]:has(div[data-testid="stCheckbox"]) {
+            flex: 0 1 auto !important;
+            width: auto !important;
+            min-width: auto !important;
         }
         </style>
     """, unsafe_allow_html=True)
