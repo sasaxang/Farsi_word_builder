@@ -80,10 +80,25 @@ with col_title:
     """, unsafe_allow_html=True)
 
 # Show authentication UI in sidebar
-show_auth_ui(lang="fa" if is_farsi else "en")
+    # --- TEMPORARY DEBUGGING ---
+    # Remove this after fixing the Cloud issue
+    with st.expander("🛠 Admin Debug: Check Secrets"):
+        try:
+            st.write("Secrets Loaded:", list(st.secrets.keys()))
+            if "auth" in st.secrets:
+                st.write("Auth Config Found:", list(st.secrets["auth"].keys()))
+                st.write("Redirect URI configured as:", st.secrets["auth"].get("redirect_uri", "MISSING"))
+            else:
+                st.error("CRITICAL: [auth] section is MISSING in secrets.")
+        except Exception as e:
+            st.error(f"Error reading secrets: {e}")
+    # ---------------------------
+
+    show_auth_ui(lang="fa" if is_farsi else "en")
 
 # Run the appropriate app based on selected language
 if is_farsi:
     run_fa(is_farsi=True)
 else:
     run_en(is_farsi=False)
+
