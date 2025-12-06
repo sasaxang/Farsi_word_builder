@@ -140,7 +140,7 @@ def update_word():
 def display_word():
     # Display a thin horizontal spacer with minimal top/bottom margin
     st.markdown("""
-    <hr style='margin: 0.5rem 0; border: none; border-top: 1px solid #ccc;' />
+    <hr style='margin: 0.25rem 0; border: none; border-top: 1px solid #ccc;' />
     """, unsafe_allow_html=True)
 
     # Display the generated word in styled container

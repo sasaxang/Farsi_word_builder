@@ -93,6 +93,16 @@ def run_app(is_farsi: bool):
         div[data-testid="column"] {
             padding: 0 !important;
         }
+        
+        /* Minimize button spacing */
+        div[data-testid="stButton"] {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        
+        button {
+            margin: 0 !important;
+        }
 
         @media (max-width: 768px) {
           /* Reduce top padding to ensure title is visible */
