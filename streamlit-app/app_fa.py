@@ -291,17 +291,8 @@ def run_app(is_farsi: bool):
  
     affixes = load_affixes(DATA_PATH)
 
-    # Initialize selections
-    for key, lst in [("selected_prefix", "prefixes"), ("selected_root", "roots"), ("selected_suffix", "suffixes")]:
-        if key not in st.session_state:
-            st.session_state[key] = affixes[lst][0] if affixes[lst] else ""
-
-    if "word_parts" not in st.session_state:
-        update_word()
-
     def spin_random(affixes):
-        # Retrieve selected word structure from session state
-        # Retrieve selected word structure from session state
+        # Retrieve selected word structure from session state (defaults to FULL structure for comprehensive random word)
         structure = st.session_state.get("word_structure", "پیشوند + ریشه + پسوند (مثل: خویش‌گربه‌پرداز)")
 
         # Determine which components to include based on selected structure
@@ -364,6 +355,12 @@ def run_app(is_farsi: bool):
 
         # Generate and store the final word
         update_word()
+
+    # Initialize selections with a random word if not already present
+    if "word_parts" not in st.session_state:
+        spin_random(affixes)
+
+
 
 
     # Affix selection UI

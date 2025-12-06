@@ -45,7 +45,7 @@ def affix_select_ui(affixes, lang="fa"):
     c1, c2, c3 = st.columns([1.5, 4, 1.5])
     
     with c1:
-        st.markdown(f"<p style='font-weight:bold; margin:0;'>{labels[lang]['structure']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-weight:bold; margin:0; padding-top: 15px;'>{labels[lang]['structure']}</p>", unsafe_allow_html=True)
         
     with c2:
         structure = st.selectbox(
@@ -73,9 +73,8 @@ def affix_select_ui(affixes, lang="fa"):
         c1, c2, c3 = st.columns([1.5, 4, 1.5])
         
         with c1:
-            # Vertical alignment hack using markdown with some top margin/padding if needed
-            # or just simple text. Using subheader or markdown for bold text.
-            st.markdown(f"<p style='font-weight:bold; margin:0;'>{label}</p>", unsafe_allow_html=True)
+            # Vertical alignment: Add padding-top to align with the "low side" (bottom) of the selectbox
+            st.markdown(f"<p style='font-weight:bold; margin:0; padding-top: 15px;'>{label}</p>", unsafe_allow_html=True)
             
         with c2:
             st.selectbox(
