@@ -71,23 +71,81 @@ def run_app(is_farsi: bool):
         }
         
         /* Force dark text for readability on cream background */
-        .stApp, .main, body {
+        .stApp:not([data-testid="stSidebar"]) .main, 
+        .stApp:not([data-testid="stSidebar"]) body {
             color: var(--text-dark) !important;
         }
-
+        
         /* Enforce Vazir font universally */
         * {
             font-family: "Vazir", sans-serif !important;
         }
         
-        /* Override Streamlit's dark mode text colors */
-        label, p, span, div {
+        /* Override Streamlit's dark mode text colors - ONLY for main content */
+        .main label, 
+        .main p:not([data-testid="stMarkdownContainer"] p), 
+        .main span, 
+        .main div:not([data-testid="stVerticalBlock"]) {
             color: var(--text-dark) !important;
         }
         
-        /* Ensure input fields have dark text */
-        input, textarea, select {
+        /* Ensure input fields have dark text - ONLY in main area */
+        .main input, 
+        .main textarea, 
+        .main select {
             color: var(--text-dark) !important;
+        }
+        
+        /* Keep sidebar text visible in dark mode */
+        [data-testid="stSidebar"] {
+            color: inherit !important;
+        }
+        
+        [data-testid="stSidebar"] label,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] span,
+        [data-testid="stSidebar"] div {
+            color: inherit !important;
+        }
+        
+        /* Sidebar fixes for all screen sizes */
+        [data-testid="stSidebar"] {
+            overflow-y: auto !important;
+            max-height: 100vh !important;
+        }
+        
+        [data-testid="stSidebar"] .block-container {
+            padding: 1rem !important;
+        }
+        
+        /* Make sidebar content visible and scrollable */
+        [data-testid="stSidebar"] > div {
+            overflow-y: auto !important;
+        }
+        
+        /* Mobile sidebar fixes */
+        @media (max-width: 768px) {
+            [data-testid="stSidebar"] {
+                overflow-y: auto !important;
+                max-height: 100vh !important;
+            }
+            
+            [data-testid="stSidebar"] .block-container {
+                padding: 1rem 0.5rem !important;
+            }
+            
+            /* Make form elements more compact on mobile */
+            [data-testid="stSidebar"] input,
+            [data-testid="stSidebar"] button {
+                font-size: 0.9rem !important;
+                padding: 0.4rem 0.5rem !important;
+            }
+            
+            [data-testid="stSidebar"] h2,
+            [data-testid="stSidebar"] h3 {
+                font-size: 1.1rem !important;
+                margin-bottom: 0.5rem !important;
+            }
         }
 
         </style>
@@ -236,6 +294,27 @@ def run_app(is_farsi: bool):
 
     # Display the generated word
     display_word()
+    
+    # Favorite button (only for logged-in users)
+    if st.session_state.get('user_id'):
+        from core.user_features import add_favorite, is_favorited
+        
+        word = st.session_state.word_parts['word']
+        is_fav = is_favorited(st.session_state.user_id, word)
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            button_label = "❤️ Remove from Favorites" if is_fav else "⭐ Add to Favorites"
+            if st.button(button_label, use_container_width=True, type="secondary"):
+                if is_fav:
+                    from core.user_features import remove_favorite
+                    if remove_favorite(st.session_state.user_id, word):
+                        st.success("Removed from favorites!")
+                        st.rerun()
+                else:
+                    if add_favorite(st.session_state.user_id, st.session_state.word_parts):
+                        st.success("Added to favorites!")
+                        st.rerun()
 
     # Random word generation button with total combinations count
     # Calculate total combinations based on current structure

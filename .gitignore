@@ -18,6 +18,10 @@ miniconda3/
 .streamlit/config.toml
 .streamlit/secrets.toml
 
+# Firebase credentials
+streamlit-app/config/firebase-credentials.json
+config/firebase-credentials.json
+
 # System files
 .DS_Store
 Thumbs.db

@@ -1,6 +1,18 @@
 import streamlit as st
 from app_fa import run_app as run_fa
 from app_en import run_app as run_en
+from config.firebase_config import initialize_firebase
+from core.auth import show_auth_ui, init_auth_state
+
+# Initialize Firebase (only once)
+try:
+    initialize_firebase()
+except Exception as e:
+    st.error(f"Failed to initialize Firebase: {e}")
+    st.stop()
+
+# Initialize authentication state
+init_auth_state()
 
 # Set page configuration
 st.set_page_config(page_title="Farsi Word Builder", layout="centered")
@@ -64,6 +76,9 @@ with col_title:
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+# Show authentication UI in sidebar
+show_auth_ui(lang="fa" if is_farsi else "en")
 
 # Run the appropriate app based on selected language
 if is_farsi:
