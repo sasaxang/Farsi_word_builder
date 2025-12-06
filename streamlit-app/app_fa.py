@@ -76,6 +76,21 @@ def run_app(is_farsi: bool):
             font-family: "Vazir", sans-serif;
         }
         
+        /* Force dark text for readability on cream background */
+        .stApp, .main, body {
+            color: var(--text-dark) !important;
+        }
+        
+        /* Override Streamlit's dark mode text colors */
+        label, p, span, div {
+            color: var(--text-dark) !important;
+        }
+        
+        /* Ensure input fields have dark text */
+        input, textarea, select {
+            color: var(--text-dark) !important;
+        }
+        
         /* Reduce padding for compact mobile view */
         .block-container {
             padding-top: 4.5rem !important;
