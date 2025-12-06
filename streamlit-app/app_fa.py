@@ -273,7 +273,28 @@ def run_app(is_farsi: bool):
         @media (max-width: 768px) {
           /* Reduce top padding to ensure title is visible */
           .block-container {
+          /* Reduce top padding to ensure title is visible */
+          .block-container {
             padding-top: 3.5rem !important;
+          }
+
+          /* Forcefully reduce vertical spacing between elements */
+          div[data-testid="stVerticalBlock"] {
+            gap: 0.2rem !important;
+          }
+          
+          .element-container {
+            margin-bottom: 0.1rem !important;
+          }
+
+          /* Tweak dropdown and checkbox spacing */
+          div[data-testid="stSelectbox"] {
+             margin-bottom: 0px !important;
+          }
+          
+          div[data-testid="stCheckbox"] {
+             padding-top: 5px !important;
+             margin-top: -15px !important; 
           }
           
           /* Ensure title and language selector remain visible */
