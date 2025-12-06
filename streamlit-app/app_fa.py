@@ -217,15 +217,14 @@ def run_app(is_farsi: bool):
     current_structure = st.session_state.get("word_structure", "پیشوند + ریشه + پسوند (مثل: خویش‌گربه‌پرداز)")
     total_combinations = calculate_total_combinations(affixes, current_structure)
     
-    col1, col2 = st.columns([3, 2])
+    # Center aligned layout with minimal spacing
+    combinations_text = f"تعداد کل ترکیبات ممکن: {convert_to_persian_numerals(total_combinations)} مورد"
+    st.markdown(f"<p style='text-align: center; margin: 0; padding: 0; font-size: 0.9rem;'>{combinations_text}</p>", unsafe_allow_html=True)
     
-    with col1:
-        # Display total combinations count
-        combinations_text = f"تعداد کل ترکیبات ممکن: {convert_to_persian_numerals(total_combinations)} مورد"
-        st.markdown(f"<p style='margin-top: 8px; font-size: 0.9rem;'>{combinations_text}</p>", unsafe_allow_html=True)
-    
+    # Center the button using columns
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.button("تصادفی بساز!" if is_farsi else "Spin Random!", on_click=lambda: spin_random(affixes))
+        st.button("تصادفی بساز!" if is_farsi else "Spin Random!", on_click=lambda: spin_random(affixes), use_container_width=True)
 
     # Initialize show_add_form state if not present
     if "show_add_form" not in st.session_state:
