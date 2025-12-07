@@ -124,7 +124,7 @@ def show_auth_ui(lang="fa"):
     else:
         # --- LOGIN UI ---
         with st.sidebar:
-            st.subheader("🔐 " + ("ورود به حساب" if lang == "fa" else "Login"))
+            st.subheader(("ورود به حساب" if lang == "fa" else "Login"))
             st.markdown("---")
             
             description = (
@@ -141,7 +141,7 @@ def show_auth_ui(lang="fa"):
             
             # Google Sign-In button
             if st.button(
-                "🔐 " + ("ورود با گوگل" if lang == "fa" else "Sign in with Google"),
+                ("ورود با گوگل" if lang == "fa" else "Sign in with Google"),
                 use_container_width=True,
                 type="primary"
             ):
