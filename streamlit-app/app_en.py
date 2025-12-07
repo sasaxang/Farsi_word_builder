@@ -356,18 +356,19 @@ def run_app(is_farsi: bool):
     display_word()
     
     # Favorite button (only for logged-in users)
-    if st.session_state.get('user_id'):
-        from core.user_features import add_favorite, is_favorited
-        
-        word = st.session_state.word_parts['word']
-        is_fav = is_favorited(st.session_state.user_id, word)
-        
-        col1, col2, col3 = st.columns([1, 2, 1])
-        with col2:
+    # Favorite button and Login prompt
+    # Center the button using columns
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.session_state.get('user_id'):
+            from core.user_features import add_favorite, is_favorited, remove_favorite
+            
+            word = st.session_state.word_parts['word']
+            is_fav = is_favorited(st.session_state.user_id, word)
+            
             button_label = "❤️ Remove from Favorites" if is_fav else "⭐ Add to Favorites"
             if st.button(button_label, use_container_width=True, type="secondary"):
                 if is_fav:
-                    from core.user_features import remove_favorite
                     if remove_favorite(st.session_state.user_id, word):
                         st.success("Removed from favorites!")
                         st.rerun()
@@ -375,6 +376,9 @@ def run_app(is_farsi: bool):
                     if add_favorite(st.session_state.user_id, st.session_state.word_parts):
                         st.success("Added to favorites!")
                         st.rerun()
+        else:
+            if st.button("Sign in for more features", use_container_width=True, type="secondary"):
+                st.login()
 
     # Random word generation button with total combinations count
     # Calculate total combinations based on current structure
